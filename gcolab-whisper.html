@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>gcolab-whisper — free AI transcription on budget hardware — arthiccc</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { background: #000; color: #fff; text-decoration: none; }
+        section { margin-bottom: 30px; }
+        .dim { color: #666; }
+        code { background: #f0f0f0; padding: 2px 5px; font-size: 0.9em; }
+        pre { background: #f0f0f0; padding: 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <a href="/posts.html">← posts</a>
+    </section>
+
+    <section>
+        <strong>gcolab-whisper — free AI transcription on budget hardware</strong>
+        <p class="dim">2026</p>
+    </section>
+
+    <section>
+        <strong>[why]</strong>
+        <p>transcription tools are either expensive or require beefy hardware. whisper.cpp exists but setup is painful — cmake, CUDA paths, dependency hell.</p>
+        <p>google colab gives you a free T4 GPU. faster-whisper gives you the fastest whisper implementation out there. why not combine them?</p>
+        <p>wanted something dead simple: upload audio → run one cell → download .srt files.</p>
+    </section>
+
+    <section>
+        <strong>[what it does]</strong>
+        <ul>
+            <li>→ runs faster-whisper large-v3-turbo on colab free tier T4 GPU</li>
+            <li>→ batch processes .m4a, .mp3, .wav, .flac, .aac</li>
+            <li>→ auto-generates .srt subtitle files per audio</li>
+            <li>→ one-click zip download for all subtitles</li>
+            <li>→ RTF ~0.23 on free-tier hardware</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the pipeline]</strong>
+        <p>two tools, one workflow:</p>
+        <pre>gcolab-whisper → audio in, .srt out
+srtplayer     → audio + .srt, synced playback</pre>
+        <p>transcribe on colab. play back locally. no cloud uploads, no API keys, no subscriptions.</p>
+    </section>
+
+    <section>
+        <strong>[how it works]</strong>
+        <p>4 cells in a colab notebook:</p>
+        <ul>
+            <li>1. wget — download your audio file</li>
+            <li>2. pip install — faster-whisper</li>
+            <li>3. transcribe — model load, batch process, save .srt</li>
+            <li>4. zip — bundle all subtitles for download</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the point]</strong>
+        <p>you don't need a $3000 rig to do AI transcription. you don't need to pay for APIs. you don't need to compile whisper.cpp from source.</p>
+        <p>you need a browser, a google account, and 5 minutes.</p>
+    </section>
+
+    <section>
+        <strong>[credits]</strong>
+        <ul>
+            <li>→ <a href="https://github.com/SYSTRAN/faster-whisper">SYSTRAN/faster-whisper</a> — CTranslate2 implementation of whisper</li>
+            <li>→ <a href="https://github.com/openai/whisper">openai/whisper</a> — original model weights</li>
+            <li>→ <a href="https://colab.research.google.com">Google Colab</a> — free T4 GPU tier</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <section>
+        <p><a href="https://github.com/arthiccc/gcolab-whisper">github repo →</a></p>
+        <p><a href="https://colab.research.google.com/github/arthiccc/gcolab-whisper/blob/main/transcribe.ipynb">open in colab →</a></p>
+        <p><a href="https://github.com/arthiccc/srtplayer">srtplayer →</a> // play back your .srt files</p>
+    </section>
+
+    <section class="dim">
+        <small>Last updated: July 2026</small>
+    </section>
+
+</body>
+</html>
