@@ -1,63 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>arthiccc</title>
-    <style>
-        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
-        a { color: #000; text-decoration: underline; }
-        a:hover { background: #000; color: #fff; text-decoration: none; }
-        ul { list-style-type: none; padding: 0; }
-        section { margin-bottom: 30px; }
-        .dim { color: #666; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>arthiccc</title>
+  <style>
+    @font-face {
+      font-family: 'Geist Mono';
+      src: url('./fonts/GeistMono-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Geist Mono', ui-monospace, 'Cascadia Code',
+        'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+      background: #fff;
+      color: #000;
+    }
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
+
+    a:hover {
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 400;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 400;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dim {
+      color: #666;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    section {
+      margin-bottom: 1.5rem;
+    }
+  </style>
 </head>
 <body>
 
-    <section>
-        <strong>arthiccc</strong><br>
-        AI/ML Engineer | ID
-    </section>
+  <header>
+    <h1><strong>arthiccc</strong></h1>
+    <p>Systems &amp; Automation Developer | Bekasi, ID</p>
+  </header>
 
-    <section>
-        <strong>[about]</strong>
-        <p>Building AI/ML solutions with a focus on practical applications. Working with LLM pipelines, speech recognition, and document automation. Prefer the command line over GUIs. Running on Linux with GPU acceleration.</p>
-        <p>Skills: Python, Machine Learning, AI/ML, ASR, Google Colab, NLP</p>
-    </section>
+  <section>
+    <h2>[about]</h2>
+    <p>
+      Building pragmatic tools, automating data pipelines, and optimizing
+      machine learning models to run on constrained budget hardware.
+    </p>
+    <p>
+      Currently working as a <strong>Data Engineering Intern at Ranca.id</strong>,
+      building self-hosted AI automation agents (n8n, Supabase, Claude API)
+      and production-grade data pipelines.
+    </p>
+    <p class="dim">
+      Prefer terminal screens over bloated GUIs. I write clean, raw code
+      to solve real-world system bottlenecks on the fly.
+    </p>
+  </section>
 
-    <section>
-        <strong>[work_scripts]</strong>
-        <ul>
-            <li>→ <a href="#">rag-document</a> <span class="dim">// RAG document Q&A system with LLM-powered answer generation</span></li>
-            <li>→ <a href="#">faster-whisper-asr</a> <span class="dim">// ASR with GPU acceleration - converts audio to subtitle files automatically using Faster-Whisper model</span></li>
-            <li style="margin-left: 20px;"> <span class="dim">Skills: Python, Machine Learning, AI/ML, ASR (Automatic Speech Recognition), Google Colab, NLP, GPU Acceleration</span></li>
-            <li>→ <a href="https://github.com/arthiccc/arc-doc">arc-doc</a> <span class="dim">// document management system with deep-search</span></li>
-            <li>→ <a href="https://github.com/arthiccc/soundgasm-dl">soundgasm-dl</a> <span class="dim">// python script to scrape and download audio</span></li>
-            <li>→ <a href="https://github.com/arthiccc/linux-admin-tools">net-diag</a> <span class="dim">// bash shortcuts for network heartbeat monitoring</span></li>
-            <li>→ <a href="#">sys-opt</a> <span class="dim">// windows-to-linux lifecycle extension scripts</span></li>
-        </ul>
-    </section>
+  <section>
+    <h2>[skills]</h2>
+    <ul>
+      <li><strong>Languages:</strong> Python, TypeScript, SQL, Bash, Go, Rust</li>
+      <li><strong>Infra:</strong> Docker, GitHub Actions, Linux, Nginx, AWS</li>
+      <li><strong>AI/Automation:</strong> n8n, Supabase, Claude API, LangChain, RAG, Faster-Whisper</li>
+      <li><strong>Frontend:</strong> React, Tailwind, Gradio</li>
+    </ul>
+  </section>
 
-    <section>
-        <strong>[reading_list]</strong>
-        <ul>
-            <li>- The C Programming Language (K&R)</li>
-            <li>- How Linux Works (Brian Ward)</li>
-            <li>- Practical Packet Analysis</li>
-        </ul>
-    </section>
+  <section>
+    <h2>[projects]</h2>
+    <ul>
+      <li>
+        → <a href="https://github.com/arthiccc/gcolab-whisper">gcolab-whisper</a>
+        <span class="dim">// Optimized ASR pipeline, RTF 0.23 on free-tier CPU</span>
+      </li>
+      <li>
+        → <a href="https://github.com/arthiccc/srtplayer">srtplayer</a>
+        <span class="dim">// Browser-based audio player with synced subtitles</span>
+      </li>
+      <li>
+        → <a href="https://github.com/arthiccc/epoxy-dashboard">epoxy-dashboard</a>
+        <span class="dim">// Multi-agent data pipeline + financial audit (Ranca.id)</span>
+      </li>
+      <li>
+        → <a href="https://github.com/arthiccc/arc-doc">arc-doc</a>
+        <span class="dim">// Privacy-first campus archiving system</span>
+      </li>
+    </ul>
+  </section>
 
-    <section>
-        <strong>[contact]</strong>
-        <p>
-            Email: <a href="mailto:arthic@duck.com">arthic@duck.com</a><br>
-            GitHub: <a href="https://github.com/arthiccc">github.com/arthiccc</a> | <a href="/posts.html">posts</a> | <a href="/faq.html">FAQ</a>
-        </p>
-    </section>
+  <section>
+    <h2>[contact]</h2>
+    <ul>
+      <li>Email: <a href="mailto:arthic@duck.com">arthic@duck.com</a></li>
+      <li>GitHub: <a href="https://github.com/arthiccc">github.com/arthiccc</a></li>
+    </ul>
+  </section>
 
-    <section class="dim">
-        <small>Last updated: May 6, 2026</small>
-    </section>
+  <footer>
+    <p class="dim">"Leave no dwarf behind. Rock and stone."</p>
+    <p class="dim"><small>Last updated: July 10, 2026</small></p>
+  </footer>
 
 </body>
 </html>
