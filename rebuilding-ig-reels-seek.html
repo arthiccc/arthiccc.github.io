@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>rebuilding instagram reels precision-seek — arthiccc</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { background: #000; color: #fff; text-decoration: none; }
+        section { margin-bottom: 30px; }
+        .dim { color: #666; }
+        code { background: #f0f0f0; padding: 2px 5px; font-size: 0.9em; }
+        pre { background: #f0f0f0; padding: 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <a href="/posts.html">← posts</a>
+    </section>
+
+    <section>
+        <strong>rebuilding instagram reels precision-seek</strong>
+        <p class="dim">2026</p>
+    </section>
+
+    <section>
+        <strong>[why]</strong>
+        <p>ig changed their DOM. old selectors broke. the seek bar stopped working.</p>
+        <p>so i looked at what else was out there. found 10+ related repos. one of them — the one i learned the most from — was <strong>404</strong>. gone.</p>
+        <p>point is: you can rebuild anything better than what's already on github. code disappears. knowledge doesn't.</p>
+    </section>
+
+    <section>
+        <strong>[what broke]</strong>
+        <p>the old script (v1.0) had 4 fatal assumptions about ig's DOM:</p>
+        <pre>
+video.closest('article')          // ig no longer wraps reels in &lt;article&gt;
+svg[aria-label*="Save']           // ig changed the aria-labels on action buttons
+no SPA navigation handling        // pushState/replaceState not intercepted
+keydown listener per video        // memory leak — new listener every scan</pre>
+    </section>
+
+    <section>
+        <strong>[what i fixed]</strong>
+        <p>v3.2.0 — rebuilt from scratch:</p>
+        <ul>
+            <li>→ pointer events + setPointerCapture for seek bar (not click)</li>
+            <li>→ capture phase keyboard handler (beats ig's arrow key navigation)</li>
+            <li>→ shadow DOM traversal with bounded BFS (no recursion)</li>
+            <li>→ SPA hooks: pushState, replaceState, popstate</li>
+            <li>→ single document-level keydown (no memory leak)</li>
+            <li>→ stopPropagation on ALL event types in capture phase</li>
+            <li>→ pause during drag for smooth scrub (no HLS stutter)</li>
+            <li>→ duration display next to save button via aria-label selector</li>
+            <li>→ space bar to pause/play</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[nasa power of 10 — applied to JS]</strong>
+        <p>nasa's jet propulsion lab wrote 10 rules for safety-critical code. I applied them to a userscript:</p>
+        <ul>
+            <li>1. no recursion — iterative BFS for DOM traversal</li>
+            <li>2. fixed loop bounds — SCAN_MAX: 50</li>
+            <li>3. no alloc after init — minimal DOM creation</li>
+            <li>4. functions &lt; 60 lines — all functions 3-43 lines</li>
+            <li>5. assertion density — validate all DOM queries</li>
+            <li>6. smallest scope — block-scoped variables</li>
+            <li>7. check returns — null checks on every querySelector</li>
+            <li>8. single-line config — CFG object at top</li>
+            <li>9. shallow deref — max 2 levels property access</li>
+            <li>10. no warnings — no unused vars, strict mode</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the point]</strong>
+        <p>github is full of broken repos. 404s. abandoned projects. scripts that worked 6 months ago and don't anymore.</p>
+        <p>but the knowledge in those repos? still there. if you read the code, understand the patterns, and rebuild — you can make something better.</p>
+        <p>one of the repos i credited learned from? <a href="https://gist.github.com/eclemens/instagram-keyboard-shortcuts">404</a>. the aria-label selectors for save/remove buttons? i found them in that gist before it disappeared. now they're in my script.</p>
+        <p>code is temporary. understanding is permanent.</p>
+    </section>
+
+    <section>
+        <strong>[credits]</strong>
+        <p>10 repos that informed this rebuild:</p>
+        <ul>
+            <li>→ <a href="https://github.com/AngeloC98/instagram-reels-controls">AngeloC98/instagram-reels-controls</a> — pointer events + setPointerCapture</li>
+            <li>→ <a href="https://github.com/xNasuni/instagram-better-controls">xNasuni/instagram-better-controls</a> — video overlay detection</li>
+            <li>→ <a href="https://github.com/ackiejoe/reels-progress">ackiejoe/reels-progress</a> — progress bar for reels</li>
+            <li>→ <a href="https://github.com/cosmic-mirror/instagram-reel-slider">cosmic-mirror/instagram-reel-slider</a> — event propagation blocking</li>
+            <li>→ <a href="https://greasyfork.org/en/scripts/581433-instagram-reels-timeline-progress-bar">-Inet (Greasy Fork)</a> — pointer events timeline</li>
+            <li>→ <a href="https://github.com/Uuygar/instagram-reels-controller">Uuygar/instagram-reels-controller</a> — fixed-position overlay</li>
+            <li>→ <span class="dim">eclemens/instagram-keyboard-shortcuts [404 — gone]</span></li>
+            <li>→ <a href="https://github.com/y252328/Instagram_Download_Button">y252328/Instagram_Download_Button</a> — SVG path matching</li>
+            <li>→ <a href="https://mathewsachin.github.io/blog/2026/03/30/instagram-userscript-download-buttons.html">mathewsachin/Instagram Download Buttons</a> — React Fiber scraping</li>
+            <li>→ <a href="https://greasyfork.org/en/scripts/521062-instagram-working-progress-bar">Emree.el (Greasy Fork)</a> — working progress bar</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <section>
+        <p><a href="https://github.com/arthiccc/instagram-reels-precision-seek">github repo →</a></p>
+    </section>
+
+    <section class="dim">
+        <small>Last updated: July 2026</small>
+    </section>
+
+</body>
+</html>
