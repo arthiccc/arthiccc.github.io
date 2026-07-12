@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>srtplayer — client-side subtitle sync — arthiccc</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { background: #000; color: #fff; text-decoration: none; }
+        section { margin-bottom: 30px; }
+        .dim { color: #666; }
+        code { background: #f0f0f0; padding: 2px 5px; font-size: 0.9em; }
+        pre { background: #f0f0f0; padding: 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <a href="/posts.html">← posts</a>
+    </section>
+
+    <section>
+        <strong>srtplayer — client-side subtitle sync</strong>
+        <p class="dim">2026</p>
+    </section>
+
+    <section>
+        <strong>[why]</strong>
+        <p>subtitle sync needs precision. you need to hear the audio, see the waveform, and read the subtitles at the same time — all locally, no uploads, no cloud.</p>
+        <p>most players are either bloated desktop apps or require uploading your files to someone else's server. wanted something dead simple: open a browser, drop your files, done.</p>
+    </section>
+
+    <section>
+        <strong>[what it does]</strong>
+        <ul>
+            <li>→ plays audio with waveform visualization (wavesurfer.js)</li>
+            <li>→ loads .srt subtitle files, syncs display with playback</li>
+            <li>→ click any subtitle segment to jump to that timestamp</li>
+            <li>→ click waveform to seek to any position</li>
+            <li>→ speed control (0.5x to 2x)</li>
+            <li>→ per-input clear buttons — clear audio or SRT without resetting player</li>
+            <li>→ waveform hover tooltip for precise seeking</li>
+            <li>→ single HTML file, fully offline</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the refactor]</strong>
+        <p>applied NASA/JPL Power of 10 rules to a browser JS app. the results:</p>
+        <pre>
+before          after
+─────────────   ─────────────
+0 assertions    13 assert() calls
+0 guards        7 guardWaveSurfer() functions
+anonymous       named event handlers
+no loop bounds  MAX_SRT_BLOCKS = 10000
+global state    centralized state object
+no XSS check    escapeHTML() on all subtitle text</pre>
+        <p>every DOM query validated. every user input escaped. every function under 60 lines. strict mode everywhere.</p>
+    </section>
+
+    <section>
+        <strong>[terminal aesthetic]</strong>
+        <p>rebuilt the entire UI from scratch to match the portfolio. no color, no gradients, no rounded corners.</p>
+        <ul>
+            <li>→ Geist Mono font (bundled, 71KB woff2)</li>
+            <li>→ monochrome wavesurfer: waveColor #ccc, progressColor #000</li>
+            <li>→ bracket sections: [input], [player], [subtitles]</li>
+            <li>→ arrow prefixes: audio →, srt →</li>
+            <li>→ dimmed comments: // select files to begin</li>
+            <li>→ text-only buttons: play [▶], stop [■]</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the pipeline]</strong>
+        <p>two tools, one workflow:</p>
+        <pre>gcolab-whisper → audio in, .srt out
+srtplayer     → audio + .srt, synced playback</pre>
+        <p>transcribe on colab. play back locally. no cloud uploads, no API keys, no subscriptions.</p>
+    </section>
+
+    <section>
+        <strong>[stats]</strong>
+        <ul>
+            <li>→ 1 file, ~660 lines</li>
+            <li>→ 38 named functions</li>
+            <li>→ 13 assertion calls</li>
+            <li>→ 7 guard functions</li>
+            <li>→ 0 external dependencies (wavesurfer bundled)</li>
+            <li>→ 0 localStorage usage</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[credits]</strong>
+        <ul>
+            <li>→ <a href="https://wavesurfer-js.org">wavesurfer.js</a> — audio visualization engine</li>
+            <li>→ <a href="https://github.com/JFK/voicesrt">JFK/voicesrt</a> — the GOAT. full-featured SRT editor with transcription, waveform, speaker management</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <section>
+        <p><a href="https://github.com/arthiccc/srtplayer">github repo →</a></p>
+        <p><a href="https://arthiccc.github.io/srtplayer/">try it live →</a></p>
+        <p><a href="https://github.com/arthiccc/gcolab-whisper">gcolab-whisper →</a> // generate .srt files with AI transcription</p>
+    </section>
+
+    <section class="dim">
+        <small>Last updated: July 2026</small>
+    </section>
+
+</body>
+</html>
