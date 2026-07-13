@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>automated audit pipeline that caught a silent COGS miscalculation — arthiccc</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { background: #000; color: #fff; text-decoration: none; }
+        section { margin-bottom: 30px; }
+        .dim { color: #666; }
+        code { background: #f0f0f0; padding: 2px 5px; font-size: 0.9em; }
+        pre { background: #f0f0f0; padding: 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <a href="/posts.html">← posts</a>
+    </section>
+
+    <section>
+        <strong>how i built an automated audit pipeline that caught a silent COGS miscalculation</strong>
+        <p class="dim">2026</p>
+    </section>
+
+    <section>
+        <strong>[why]</strong>
+        <p>a multi-marketplace e-commerce dashboard was reporting <strong>100% margin</strong> on two of three sales channels. that's not a healthy business — that's a broken parser.</p>
+        <p>the original dashboard was a single python script: read excel files, calculate numbers, spit out HTML. when the marketplace export format changed (or when certain files didn't have the right columns), the parser didn't crash. it just output zeros. silently.</p>
+        <p>two channels showed zero cost of goods sold. zero COGS means 100% margin. the dashboard looked great. the numbers were wrong.</p>
+    </section>
+
+    <section>
+        <strong>[what broke]</strong>
+        <p>the core problem: <strong>missing SKU cross-referencing</strong>.</p>
+        <ul>
+            <li>→ the primary marketplace export had Seller SKU columns — COGS matched fine</li>
+            <li>→ the secondary marketplace income files only had internal product IDs</li>
+            <li>→ the COGS lookup table used Seller SKU as key</li>
+            <li>→ no match = COGS = 0 = fake 100% margin</li>
+        </ul>
+        <p>the monolith had no validation layer. no intermediate state to inspect. the raw file went in, HTML came out, and nobody checked the middle.</p>
+    </section>
+
+    <section>
+        <strong>[the audit approach]</strong>
+        <p>instead of patching the monolith, i rebuilt the entire pipeline as a <strong>6-agent system</strong> with inspectable intermediate JSON at every stage.</p>
+        <pre>Google Drive (xlsx/csv)
+     │
+     ▼
+┌─────────────────────────────────────────────┐
+│           6-AGENT PIPELINE                   │
+│                                              │
+│  [1] Collect  → data/raw/{month}/            │
+│  [2] Analyze  → data/schema/{month}/   (LLM)│
+│  [3] Clean    → data/clean/{month}/          │
+│  [4] Margin   → data/margin/summary.json     │
+│  [5] Generate → output/index.html            │
+│  [6] QC       → qc_report.json         (LLM)│
+│                                              │
+│  Deploy to Cloudflare Pages                  │
+└─────────────────────────────────────────────┘</pre>
+        <p>the key insight: <strong>agent 2 (LLM) auto-detects file schema</strong>. when marketplace changes their export format, the LLM reads the first 20 rows and maps columns automatically. no hardcoded column names.</p>
+        <p>but the real fix was in <strong>agent 3 (Clean)</strong>: cross-referencing the Completed Order CSV (which HAS Seller SKU) against the COGS lookup table, then filtering to only orders that appeared in the income file.</p>
+    </section>
+
+    <section>
+        <strong>[the code pattern]</strong>
+        <p>the function that caught the discrepancy:</p>
+        <pre>def build_completed_order_sku_map(csv_path):
+    """
+    Read Completed Order CSV
+    → {month: {channel: {order_id: [(sku, qty)]}}}
+    Used to match TikTok/Tokopedia orders
+    to COGS via Seller SKU.
+    """
+    df = pd.read_csv(csv_path)
+    mapping = {}
+    for _, row in df.iterrows():
+        order_id = row['Order ID']
+        sku      = row['Seller SKU']
+        qty      = int(row['Quantity'])
+        channel  = row['Purchase Channel'].lower()
+        month    = parse_date(row['Created Time']).month
+
+        mapping[month][channel][order_id] \
+            .append((sku, qty))
+    return mapping</pre>
+        <p>this function bridges the gap: income files give us <em>which orders were settled</em>, completed order CSVs give us <em>which SKUs were in each order</em>, and the COGS lookup gives us <em>cost per SKU</em>.</p>
+        <p>three data sources, one join. the discrepancy became visible.</p>
+    </section>
+
+    <section>
+        <strong>[the result]</strong>
+        <p>after the fix:</p>
+        <ul>
+            <li>→ primary channel: accurate COGS, thin margin (as expected for high-volume distribution)</li>
+            <li>→ secondary channels: COGS now calculated per-unit from actual order line items</li>
+            <li>→ overall margin corrected from fake 100% to actual single-digit percentage</li>
+            <li>→ QC agent now <strong>blocks deploys</strong> if any channel shows suspicious patterns</li>
+        </ul>
+        <p>the pipeline runs on GitHub Actions. operator uploads files to Google Drive, triggers workflow, deploys to Cloudflare Pages. total cost per run: <strong>under $0.03</strong> (LLM calls for schema detection + QC anomaly detection).</p>
+    </section>
+
+    <section>
+        <strong>[the audit trail]</strong>
+        <p>the real value isn't just the fix — it's the <strong>inspectable intermediate state</strong>:</p>
+        <ul>
+            <li>→ <code>data/raw/</code> — exact files downloaded from Google Drive</li>
+            <li>→ <code>data/schema/</code> — how the LLM interpreted each file (cached, re-used)</li>
+            <li>→ <code>data/clean/</code> — normalized JSON per channel per month</li>
+            <li>→ <code>data/margin/</code> — final P&L with per-channel breakdown</li>
+        </ul>
+        <p>when something looks wrong, you don't debug a 800-line monolith. you inspect the specific JSON layer where the problem lives.</p>
+    </section>
+
+    <section>
+        <strong>[takeaway]</strong>
+        <p><strong>data pipelines need validation at every layer, not just at the end.</strong></p>
+        <p>the v1 monolith was a black box: excel in, html out. when the numbers were wrong, there was nothing to inspect. no intermediate state. no audit trail.</p>
+        <p>the v2 pipeline generates inspectable JSON at every stage. the QC agent uses both rule-based checks (total not zero, COGS within range) and LLM anomaly detection ("does this margin look weird for an epoxy resin distributor?").</p>
+        <p>the lesson: <strong>silent failures are worse than crashes</strong>. a parser that outputs zeros instead of raising an error will let bad data deploy to production.</p>
+    </section>
+
+    <section>
+        <strong>[tech stack]</strong>
+        <ul>
+            <li>→ Python 3.11 + pandas — data processing</li>
+            <li>→ Claude Haiku — schema detection + QC anomaly detection</li>
+            <li>→ GitHub Actions — CI/CD pipeline</li>
+            <li>→ Cloudflare Pages — static hosting</li>
+            <li>→ Google Drive API — file collection</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[credits]</strong>
+        <ul>
+            <li>→ <a href="https://github.com/arthiccc/epoxy-dashboard">arthiccc/epoxy-dashboard</a> — the pipeline</li>
+            <li>→ <a href="https://github.com/anthropics/claude-api">Anthropic Claude API</a> — LLM for schema detection + QC</li>
+            <li>→ <a href="https://pandas.pydata.org">pandas</a> — data wrangling</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <section>
+        <p><a href="https://github.com/arthiccc/epoxy-dashboard">github repo →</a></p>
+        <p><a href="https://arthiccc-epoxy-dashboard.pages.dev">live dashboard →</a></p>
+    </section>
+
+    <section class="dim">
+        <small>Last updated: July 2026</small>
+    </section>
+
+</body>
+</html>
