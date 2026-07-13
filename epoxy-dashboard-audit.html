@@ -47,21 +47,12 @@
     <section>
         <strong>[the audit approach]</strong>
         <p>instead of patching the monolith, i rebuilt the entire pipeline as a <strong>6-agent system</strong> with inspectable intermediate JSON at every stage.</p>
-        <pre>Google Drive (xlsx/csv)
-     │
-     ▼
-┌─────────────────────────────────────────────┐
-│           6-AGENT PIPELINE                   │
-│                                              │
-│  [1] Collect  → data/raw/{month}/            │
-│  [2] Analyze  → data/schema/{month}/   (LLM)│
-│  [3] Clean    → data/clean/{month}/          │
-│  [4] Margin   → data/margin/summary.json     │
-│  [5] Generate → output/index.html            │
-│  [6] QC       → qc_report.json         (LLM)│
-│                                              │
-│  Deploy to Cloudflare Pages                  │
-└─────────────────────────────────────────────┘</pre>
+        <pre>[1] Collect  → download files from cloud storage
+[2] Analyze  → LLM auto-detects file schema
+[3] Clean    → raw files → normalized JSON
+[4] Margin   → calculate profit per channel
+[5] Generate → JSON → static HTML
+[6] QC       → validate numbers + LLM anomaly check</pre>
         <p>the key insight: <strong>agent 2 (LLM) auto-detects file schema</strong>. when marketplace changes their export format, the LLM reads the first 20 rows and maps columns automatically. no hardcoded column names.</p>
         <p>but the real fix was in <strong>agent 3 (Clean)</strong>: cross-referencing the Completed Order CSV (which HAS Seller SKU) against the COGS lookup table, then filtering to only orders that appeared in the income file.</p>
     </section>
@@ -120,7 +111,7 @@
         <strong>[takeaway]</strong>
         <p><strong>data pipelines need validation at every layer, not just at the end.</strong></p>
         <p>the v1 monolith was a black box: excel in, html out. when the numbers were wrong, there was nothing to inspect. no intermediate state. no audit trail.</p>
-        <p>the v2 pipeline generates inspectable JSON at every stage. the QC agent uses both rule-based checks (total not zero, COGS within range) and LLM anomaly detection ("does this margin look weird for an epoxy resin distributor?").</p>
+        <p>the v2 pipeline generates inspectable JSON at every stage. the QC agent uses both rule-based checks (total not zero, COGS within range) and LLM anomaly detection ("does this margin look weird for this business?").</p>
         <p>the lesson: <strong>silent failures are worse than crashes</strong>. a parser that outputs zeros instead of raising an error will let bad data deploy to production.</p>
     </section>
 
