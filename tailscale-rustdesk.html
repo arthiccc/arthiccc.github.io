@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>p2p remote desktop for $0: tailscale + rustdesk — arthiccc</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.5; background: #fff; color: #000; }
+        a { color: #000; text-decoration: underline; }
+        a:hover { background: #000; color: #fff; text-decoration: none; }
+        section { margin-bottom: 30px; }
+        .dim { color: #666; }
+        code { background: #f0f0f0; padding: 2px 5px; font-size: 0.9em; }
+        pre { background: #f0f0f0; padding: 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <a href="/posts.html">← posts</a>
+    </section>
+
+    <section>
+        <strong>p2p remote desktop for $0: tailscale + rustdesk</strong>
+        <p class="dim">2026 — 200ms vs 2000ms at 4000km, no relay rental</p>
+    </section>
+
+    <section>
+        <strong>[why]</strong>
+        <p>two windows machines, 4000km apart. needed remote desktop that doesn't feel like a slideshow.</p>
+        <p>tried rustdesk public relay first — free, easy, but <strong>2000ms</strong> latency in my real test. unusable for anything beyond clicking.</p>
+        <p>self-hosting relay (hbbs/hbbr) = rent VPS, open ports, maintain it. too expensive to build or rent for personal use.</p>
+    </section>
+
+    <section>
+        <strong>[what sucks about public relay]</strong>
+        <ul>
+            <li>→ shared relay = bandwidth cap + routed far from both ends</li>
+            <li>→ no guarantee of p2p — often stays relayed</li>
+            <li>→ 2000ms at 4000km in my test — 10x slower than direct</li>
+            <li>→ self-host fixes it but costs $5-7/mo + ops</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[the trick]</strong>
+        <p>tailscale = wireguard mesh + DERP fallback. creates a private tailnet — both machines get a stable <code>100.x.x.x</code> IP. wireguard tries direct UDP hole-punch first, falls back to DERP relay only if direct fails.</p>
+        <p>rustdesk over tailscale IP = p2p when possible. no public relay in the path, no VPS to rent, no port forwarding, no CGNAT pain.</p>
+        <p>i keep rustdesk public relay enabled as fallback — but in practice it never kicks in. tailnet has been stable.</p>
+    </section>
+
+    <section>
+        <strong>[setup — windows]</strong>
+        <p>4 steps, 5 minutes:</p>
+        <pre>1. install tailscale on both machines
+   → https://tailscale.com/download/windows
+
+2. login + connect
+   → open tailscale → Log in → same account on both
+   → check IPs: tailscale ip -4  → 100.x.x.x
+
+3. install rustdesk on both
+   → https://github.com/rustdesk/rustdesk/releases
+
+4. connect via tailnet IP
+   → on remote: copy its 100.x.x.x
+   → on local: rustdesk → enter 100.x.x.x as ID → connect
+   → keep default relay enabled — auto fallback if tailnet fails
+
+# optional: allow tailscale through windows firewall
+# tailscale installer does this, but if blocked:
+# Windows Defender Firewall → Allow app → tailscale</pre>
+    </section>
+
+    <section>
+        <strong>[result]</strong>
+        <p>same two machines, same 4000km distance, same network:</p>
+        <pre>rustdesk public relay: ~2000ms  // laggy, slideshow
+tailscale + rustdesk:  ~200ms max // smooth, usable 1080p</pre>
+        <p>10x difference in my real test. not a synthetic benchmark — just daily use, remote desktop over tailnet feels near-local. 1080p, no stutter, input feels instant compared to relay.</p>
+        <p class="dim">YMMV — depends on ISP, distance, and whether wireguard gets direct UDP or falls back to DERP. even via DERP, still beats public relay in my case.</p>
+    </section>
+
+    <section>
+        <strong>[why no VPS needed]</strong>
+        <ul>
+            <li>→ $0 — tailscale free tier covers personal tailnet (100 devices)</li>
+            <li>→ no hbbs/hbbr to host, update, or monitor</li>
+            <li>→ no ports to open — works behind CGNAT/NAT</li>
+            <li>→ same tailnet re-use for SSH, RDP, SMB, anything — not just rustdesk</li>
+        </ul>
+    </section>
+
+    <section>
+        <strong>[takeaway]</strong>
+        <p>you don't need to rent a relay server for personal remote desktop.</p>
+        <p>rustdesk is great — but pair it with tailscale and it becomes p2p. direct wireguard path, no public relay bottleneck, no monthly bill.</p>
+        <p>install tailscale, use its IP in rustdesk, keep relay as backup. that's it.</p>
+    </section>
+
+    <section>
+        <strong>[tech stack]</strong>
+        <ul>
+            <li>→ <a href="https://tailscale.com">tailscale</a> — wireguard mesh, DERP fallback</li>
+            <li>→ <a href="https://github.com/rustdesk/rustdesk">rustdesk</a> — open-source remote desktop</li>
+            <li>→ wireguard — p2p UDP hole-punch</li>
+            <li>→ windows 10/11 — both ends</li>
+        </ul>
+    </section>
+
+    <hr>
+
+    <section>
+        <p><a href="https://tailscale.com/download">tailscale download →</a></p>
+        <p><a href="https://github.com/rustdesk/rustdesk">rustdesk github →</a></p>
+    </section>
+
+    <section class="dim">
+        <small>Last updated: September 2026</small>
+    </section>
+
+</body>
+</html>
